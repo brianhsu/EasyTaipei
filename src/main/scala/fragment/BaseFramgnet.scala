@@ -25,14 +25,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import TypedResource._
 
-abstract class BaseFragment[T <: ClusterItem] extends Fragment {
+abstract class BaseFragment extends Fragment {
 
   private var mapView: MapView = _
 
-  protected def getDataSet: Future[List[T]]
-  protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[T]): ClusterRenderer[T]
+  protected def getDataSet: Future[List[MarkerItem]]
+  protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem]
 
-  private def addMarkers(rootView: View, clusterManager: ClusterManager[T]): Unit = {
+  private def addMarkers(rootView: View, clusterManager: ClusterManager[MarkerItem]): Unit = {
 
     val loadingIndicator = Snackbar.make(rootView, "讀取中，請稍候", Snackbar.LENGTH_INDEFINITE)
     val dataSet = getDataSet
@@ -109,7 +109,7 @@ abstract class BaseFragment[T <: ClusterItem] extends Fragment {
       val cameraPosition = new CameraPosition.Builder().target(new LatLng(25.041675, 121.551623)).zoom(11).build();
       googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
       updateDefaultLocation()
-      val clusterManager = new ClusterManager[T](getContext, googleMap)
+      val clusterManager = new ClusterManager[MarkerItem](getContext, googleMap)
       googleMap.setOnCameraChangeListener(clusterManager)
       googleMap.setOnMarkerClickListener(clusterManager)
       clusterManager.setRenderer(getRenderer(getContext, googleMap, clusterManager))
