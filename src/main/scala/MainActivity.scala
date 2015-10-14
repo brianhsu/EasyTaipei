@@ -17,22 +17,25 @@ import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener
 
 class MainActivity extends AppCompatActivity with TypedFindView
 {
+  private lazy val tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager)
+
   override def onCreate(savedInstanceState: Bundle) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-
     val actionBar = findView(TR.toolbar)
     val viewPager = findView(TR.container)
     val tabLayout = findView(TR.tabs)
-    val tabPagerAdapter = new TabPagerAdapter(getSupportFragmentManager)
-
     viewPager.setAdapter(tabPagerAdapter)
     tabLayout.setupWithViewPager(viewPager)
     setSupportActionBar(actionBar)
-
   }
 
   class TabPagerAdapter(fm: FragmentManager) extends FragmentPagerAdapter(fm) {
+    
+    val tolietFragment = new TolietFragment
+    val trashCanFragment = new TrashCanFragment
+    val drinkingStationFragment = new DrinkingStationFragment
+
     override def getCount = 3
     override def getPageTitle(position: Int): CharSequence = position match {
       case 0 => "公共廁所"
@@ -43,40 +46,12 @@ class MainActivity extends AppCompatActivity with TypedFindView
     override def getItem(position: Int): Fragment = position match {
       case 0 => new TolietFragment
       case 1 => new TrashCanFragment
-      case 2 => new DrinkingFragment
+      case 2 => new DrinkingStationFragment
     }
     
   }
 
-  class DrinkingFragment extends Fragment {
-    import TypedResource._
-    override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-      val rootView = inflater.inflate(R.layout.fragment_drinking_station, container, false)
-      val textView = rootView.findView(TR.section_label)
-      textView.setText("飲水台")
-      rootView
-    }
-  }
-
-  class TrashCanFragment extends Fragment {
-    import TypedResource._
-    override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-      val rootView = inflater.inflate(R.layout.fragment_drinking_station, container, false)
-      val textView = rootView.findView(TR.section_label)
-      textView.setText("垃圾筒")
-      rootView
-    }
-  }
-
-  class TolietFragment extends Fragment {
-    import TypedResource._
-    override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-      val rootView = inflater.inflate(R.layout.fragment_drinking_station, container, false)
-      val textView = rootView.findView(TR.section_label)
-      textView.setText("洗手間")
-      rootView
-    }
-  }
-
-
 }
+
+
+
