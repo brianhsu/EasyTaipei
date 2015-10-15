@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -117,15 +118,15 @@ abstract class BaseFragment extends Fragment {
     }
   }
 
-
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
+
+    println("=====> onCreateView....")
+
     val rootView = inflater.inflate(R.layout.fragment_map, container, false)
     mapView = rootView.findView(TR.mapView)
     mapView.onCreate(savedInstanceState)
     mapView.onResume()
-
     MapsInitializer.initialize(getActivity().getApplicationContext())
-
     val mapReadyCallback = createMapReadyCallback(rootView)
     mapView.getMapAsync(mapReadyCallback)
     rootView
