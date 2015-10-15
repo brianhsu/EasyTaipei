@@ -5,12 +5,12 @@ import java.io._
 import org.json4s._
 import org.json4s.native.JsonMethods._
 
-class DrinkingStationDataGetter(context: Context) extends BaseDataGetter[MarkerItem](context) {
+class DrinkingStationDataGetter(context: Context) extends BaseDataGetter(context) {
 
   protected val jsonDataURL = "http://data.taipei/opendata/datalist/apiAccess?scope=resourceAquire&rid=2924f7f6-221e-416e-93ff-e8561e8d7327"
   protected val cacheFileName = "/drinkingStation.json"
 
-  def parseToTolietList(jsonData: String): List[MarkerItem] = {
+  def parseToDataList(jsonData: String): List[MarkerItem] = {
     val JArray(toliets) = parse(jsonData) \\ "results"
 
     toliets.map { case data => 

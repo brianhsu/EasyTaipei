@@ -6,11 +6,11 @@ import java.io._
 import scala.io.Source
 import scala.util.Try
 
-abstract class BaseDataGetter[T](context: Context) {
+abstract class BaseDataGetter(context: Context) {
 
   protected val cacheFileName: String
   protected val jsonDataURL: String
-  protected def parseToTolietList(jsonData: String): List[T]
+  protected def parseToDataList(jsonData: String): List[MarkerItem]
 
   def getCacheDir: String = {
     val hasSDCard = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable
@@ -21,19 +21,18 @@ abstract class BaseDataGetter[T](context: Context) {
     }  
   }
 
-  def getJsonFromFile: Try[String] = Try { Source.fromFile(s"${getCacheDir}/$cacheFileName").mkString }
-  def getJsonFromNetwork: Try[String] = Try {
+  def getJsonFromFile: Try[List[MarkerItem]] = Try { parseToDataList(Source.fromFile(s"${getCacheDir}/$cacheFileName").mkString) }
+  def getJsonFromNetwork: Try[List[MarkerItem]] = Try {
     val jsonData = Source.fromURL(jsonDataURL).mkString
     val cacheFile = new PrintWriter(new File(s"${getCacheDir}/$cacheFileName"))
     cacheFile.println(jsonData)
     cacheFile.close()
-    jsonData
+    parseToDataList(jsonData)
   }
 
-  def getJsonData: List[T] = {
-    val jsonDataFromCache = getJsonFromFile.map(parseToTolietList)
-    println("=====> jsonDataFromCache:" + jsonDataFromCache)
-    val jsonDataHolder = jsonDataFromCache orElse getJsonFromNetwork.map(parseToTolietList)
+  def getJsonData: List[MarkerItem] = {
+    val jsonDataFromCache = getJsonFromFile
+    val jsonDataHolder = jsonDataFromCache orElse getJsonFromNetwork
     jsonDataHolder.get
   }
 }
