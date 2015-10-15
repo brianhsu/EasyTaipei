@@ -3,13 +3,17 @@ package moe.brianhsu.easytaipei
 import android.content.Context
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.MarkerOptions
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.clustering.view.ClusterRenderer
+import scala.concurrent.ExecutionContext
+
+import java.util.concurrent.Executors
 
 class TrashCanFragment extends BaseFragment {
+
+  implicit val executionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(12))
 
   protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem] = {
     new DefaultClusterRenderer(context, map, clusterManager) {
