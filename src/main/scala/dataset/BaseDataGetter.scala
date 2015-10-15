@@ -21,16 +21,19 @@ abstract class BaseDataGetter[T](context: Context) {
     }  
   }
 
-  def getJsonFromFile: Try[String] = Try { Source.fromFile(s"${getCacheDir}/tolietDataSet.json").mkString }
+  def getJsonFromFile: Try[String] = Try { Source.fromFile(s"${getCacheDir}/$cacheFileName").mkString }
   def getJsonFromNetwork: Try[String] = Try {
     val jsonData = Source.fromURL(jsonDataURL).mkString
     val cacheFile = new PrintWriter(new File(s"${getCacheDir}/$cacheFileName"))
+    cacheFile.println(jsonData)
     cacheFile.close()
     jsonData
   }
 
   def getJsonData: List[T] = {
-    val jsonDataHolder = getJsonFromFile.map(parseToTolietList) orElse getJsonFromNetwork.map(parseToTolietList)
+    val jsonDataFromCache = getJsonFromFile.map(parseToTolietList)
+    println("=====> jsonDataFromCache:" + jsonDataFromCache)
+    val jsonDataHolder = jsonDataFromCache orElse getJsonFromNetwork.map(parseToTolietList)
     jsonDataHolder.get
   }
 }

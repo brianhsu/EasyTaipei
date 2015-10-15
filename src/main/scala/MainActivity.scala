@@ -26,6 +26,7 @@ class MainActivity extends AppCompatActivity with TypedFindView
     val viewPager = findView(TR.container)
     val tabLayout = findView(TR.tabs)
     viewPager.setAdapter(tabPagerAdapter)
+    viewPager.setOffscreenPageLimit(10)
     tabLayout.setupWithViewPager(viewPager)
     setSupportActionBar(actionBar)
   }
@@ -44,13 +45,11 @@ class MainActivity extends AppCompatActivity with TypedFindView
     }
 
     override def getItem(position: Int): Fragment = position match {
-      case 0 => new TolietFragment
-      case 1 => new TrashCanFragment
-      case 2 => new DrinkingStationFragment
+      case 0 => tolietFragment
+      case 1 => trashCanFragment
+      case 2 => drinkingStationFragment
     }
-    
   }
-
 }
 
 
