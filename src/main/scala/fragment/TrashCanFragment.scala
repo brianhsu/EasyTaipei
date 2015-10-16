@@ -15,14 +15,6 @@ class TrashCanFragment extends BaseFragment {
 
   implicit val executionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(12))
 
-  protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem] = {
-    new DefaultClusterRenderer(context, map, clusterManager) {
-      override def onBeforeClusterItemRendered(item: MarkerItem, markerOptions: MarkerOptions): Unit = {
-        markerOptions.title(item.title)
-      }
-    }
-  }
-
   protected def getDataSet: Future[List[MarkerItem]] = {
     
     val datasets = Array(

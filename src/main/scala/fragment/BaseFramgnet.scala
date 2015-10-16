@@ -17,6 +17,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
@@ -31,7 +32,13 @@ abstract class BaseFragment extends Fragment {
   private var mapView: MapView = _
 
   protected def getDataSet: Future[List[MarkerItem]]
-  protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem]
+  protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem] = {
+    new DefaultClusterRenderer(context, map, clusterManager) {
+      override def onBeforeClusterItemRendered(item: MarkerItem, markerOptions: MarkerOptions): Unit = {
+        markerOptions.title(item.title)
+      }
+    }
+  }
 
   private def addMarkers(rootView: View, clusterManager: ClusterManager[MarkerItem]): Unit = {
 

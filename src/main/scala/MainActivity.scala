@@ -36,18 +36,21 @@ class MainActivity extends AppCompatActivity with TypedFindView
     val tolietFragment = new TolietFragment
     val trashCanFragment = new TrashCanFragment
     val drinkingStationFragment = new DrinkingStationFragment
+    val breastfeedingRoomFragment = new BreastfeedingRoomFragment
 
-    override def getCount = 3
+    override def getCount = 4
     override def getPageTitle(position: Int): CharSequence = position match {
       case 0 => "公共廁所"
       case 1 => "行人垃圾筒"
       case 2 => "飲水台"
+      case 3 => "哺集乳室"
     }
 
     override def getItem(position: Int): Fragment = position match {
       case 0 => tolietFragment
       case 1 => trashCanFragment
       case 2 => drinkingStationFragment
+      case 3 => breastfeedingRoomFragment
     }
   }
 }
