@@ -12,9 +12,9 @@ import com.google.maps.android.clustering.view.ClusterRenderer
 class TolietFragment extends BaseFragment {
 
 
-  protected def getDataSet: Future[List[MarkerItem]] = Future { 
+  protected def getDataSet(forceUpdate: Boolean): Future[List[MarkerItem]] = Future { 
     val tolietDataGetter = new TolietDataGetter(getContext)
-    tolietDataGetter.getJsonData 
+    tolietDataGetter.getJsonData(forceUpdate)
   }
 
 }

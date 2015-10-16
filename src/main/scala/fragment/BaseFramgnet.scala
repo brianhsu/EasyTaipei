@@ -30,8 +30,9 @@ import TypedResource._
 abstract class BaseFragment extends Fragment {
 
   private var mapView: MapView = _
+  private var clusterManagerHolder: Option[ClusterManager[MarkerItem]] = None
 
-  protected def getDataSet: Future[List[MarkerItem]]
+  protected def getDataSet(forceUpdate: Boolean): Future[List[MarkerItem]]
   protected def getRenderer(context: Context, map: GoogleMap, clusterManager: ClusterManager[MarkerItem]): ClusterRenderer[MarkerItem] = {
     new DefaultClusterRenderer(context, map, clusterManager) {
       override def onBeforeClusterItemRendered(item: MarkerItem, markerOptions: MarkerOptions): Unit = {
@@ -43,7 +44,7 @@ abstract class BaseFragment extends Fragment {
   private def addMarkers(rootView: View, clusterManager: ClusterManager[MarkerItem]): Unit = {
 
     val loadingIndicator = Snackbar.make(rootView, "讀取中，請稍候", Snackbar.LENGTH_INDEFINITE)
-    val dataSet = getDataSet
+    val dataSet = getDataSet(false)
 
     loadingIndicator.show()
 
@@ -117,17 +118,64 @@ abstract class BaseFragment extends Fragment {
       val cameraPosition = new CameraPosition.Builder().target(new LatLng(25.041675, 121.551623)).zoom(11).build();
       googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
       updateDefaultLocation()
-      val clusterManager = new ClusterManager[MarkerItem](getContext, googleMap)
-      googleMap.setOnCameraChangeListener(clusterManager)
-      googleMap.setOnMarkerClickListener(clusterManager)
-      clusterManager.setRenderer(getRenderer(getContext, googleMap, clusterManager))
-      addMarkers(rootView, clusterManager)
+      setClusterManager(rootView, googleMap, false)
+    }
+  }
+
+  private def setClusterManager(rootView: View, googleMap: GoogleMap, forceUpdate: Boolean) {
+
+    val clusterManager = new ClusterManager[MarkerItem](getContext, googleMap)
+
+    googleMap.setOnCameraChangeListener(clusterManager)
+    googleMap.setOnMarkerClickListener(clusterManager)
+    clusterManager.setRenderer(getRenderer(getContext, googleMap, clusterManager))
+    addMarkers(rootView, clusterManager)
+
+    this.clusterManagerHolder = Some(clusterManager)
+  }
+
+  def updateMarkers() {
+
+    import android.app.ProgressDialog
+
+    println("====> update in " + this + "....")
+    val prog= ProgressDialog.show(getActivity(), "更新中", "更新資料中，請稍候……", true, false)
+    val updater = getDataSet(true)
+
+
+    updater.onSuccess { case dataItems => 
+      getActivity.runOnUiThread(new Runnable {
+        override def run() {
+          println("====> dataItems:" + dataItems)
+          clusterManagerHolder.foreach { clusterManager =>
+            clusterManager.clearItems()
+            dataItems.foreach(x => clusterManager.addItem(x))
+            clusterManager.cluster()
+          }
+          prog.dismiss() 
+        }
+      })
+    }
+
+    updater.onFailure { case e: Exception => 
+      getActivity.runOnUiThread(new Runnable {
+        override def run() {
+          e.printStackTrace()
+          prog.dismiss() 
+          val snackBar = Snackbar.make(getActivity.findView(TR.main_content), "無法取得資料，請檢查網路狀態後重試", Snackbar.LENGTH_INDEFINITE)
+          snackBar.setActionTextColor(android.graphics.Color.YELLOW)
+          snackBar.setAction("OK", new View.OnClickListener {
+            override def onClick(view: View) {
+              snackBar.dismiss()
+            }
+          })
+          snackBar.show()
+        }
+      })
     }
   }
 
   override def onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View = {
-
-    println("=====> onCreateView....")
 
     val rootView = inflater.inflate(R.layout.fragment_map, container, false)
     mapView = rootView.findView(TR.mapView)

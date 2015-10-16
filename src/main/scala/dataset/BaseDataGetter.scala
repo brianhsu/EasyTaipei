@@ -30,10 +30,11 @@ abstract class BaseDataGetter(context: Context) {
     parseToDataList(jsonData)
   }
 
-  def getJsonData: List[MarkerItem] = {
-    val jsonDataFromCache = getJsonFromFile
-    val jsonDataHolder = jsonDataFromCache orElse getJsonFromNetwork
-    jsonDataHolder.get
+  def getJsonData(forceUpdate: Boolean): List[MarkerItem] = {
+    forceUpdate match {
+      case true  => getJsonFromNetwork.get
+      case false => (getJsonFromFile orElse getJsonFromNetwork).get
+    }
   }
 }
 

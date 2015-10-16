@@ -20,9 +20,9 @@ class BreastfeedingRoomFragment extends BaseFragment {
     }
   }
 
-  protected def getDataSet: Future[List[MarkerItem]] = Future { 
+  protected def getDataSet(forceUpdate: Boolean): Future[List[MarkerItem]] = Future { 
     val dataGetter = new BreastfeedingRoomDataGetter(getContext)
-    dataGetter.getJsonData 
+    dataGetter.getJsonData(forceUpdate)
   }
 
 }

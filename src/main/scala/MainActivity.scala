@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.support.v4.app.Fragment
 import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener
 
+import scala.collection.JavaConversions._
 
 class MainActivity extends AppCompatActivity with TypedFindView
 {
@@ -25,10 +26,18 @@ class MainActivity extends AppCompatActivity with TypedFindView
     val actionBar = findView(TR.toolbar)
     val viewPager = findView(TR.container)
     val tabLayout = findView(TR.tabs)
+    val fab = findView(TR.fab)
     viewPager.setAdapter(tabPagerAdapter)
     viewPager.setOffscreenPageLimit(10)
     tabLayout.setupWithViewPager(viewPager)
     setSupportActionBar(actionBar)
+    fab.setOnClickListener(new View.OnClickListener {
+      override def onClick(view: View) {
+        val fragments = getSupportFragmentManager().getFragments
+        val visibleFragments = fragments.filter(f => f != null && f.getUserVisibleHint)
+        visibleFragments.foreach { f => f.asInstanceOf[BaseFragment].updateMarkers() }
+      }
+    })
   }
 
   class TabPagerAdapter(fm: FragmentManager) extends FragmentPagerAdapter(fm) {
